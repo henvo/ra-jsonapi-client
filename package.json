@@ -1,0 +1,24 @@
+{
+  "name": "ra-jsonapi-client",
+  "version": "0.0.1",
+  "description": "JSON API data provider for react-admin.",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/henvo/ra-jsonapi-client.git"
+  },
+  "keywords": [
+    "rails-react",
+    "jsonapi",
+    "npm"
+  ],
+  "author": "Henning Vogt <git@henvo.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/henvo/ra-jsonapi-client/issues"
+  },
+  "homepage": "https://github.com/henvo/ra-jsonapi-client#readme"
+}
