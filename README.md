@@ -4,7 +4,7 @@ A JSONAPI compatible data provider for
 [react-admin](https://github.com/marmelab/react-admin).
 
 **Disclaimer**: This project is a work in progress and is missing some basic
-actions (e.g. deleting resources).
+functionality.
 
 ## Installation
 
