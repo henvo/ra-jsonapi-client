@@ -101,7 +101,10 @@ export default apiUrl => (type, resource, params) => {
   }
 
   return fetch(url, options)
-    .then(res => res.json())
+    .then(res => res.text().then((text) => {
+      const json = text.length ? JSON.parse(text) : {};
+      return json;
+    }))
     .then((json) => {
       switch (type) {
         case GET_LIST: {
@@ -117,28 +120,39 @@ export default apiUrl => (type, resource, params) => {
         }
 
         case GET_ONE: {
-          const { data } = json;
-          const { id } = data;
+          const { id, attributes } = json.data;
 
-          return { data: Object.assign({ id }, data.attributes) };
+          return {
+            data: {
+              id, ...attributes,
+            },
+          };
         }
 
         case CREATE: {
-          const { data } = json;
-          const { id } = data;
+          const { id, attributes } = json.data;
 
-          return { data: Object.assign({ id }, data.attributes) };
+          return {
+            data: {
+              id, ...attributes,
+            },
+          };
         }
 
         case UPDATE: {
-          const { data } = json;
-          const { id } = data;
+          const { id, attributes } = json.data;
 
-          return { data: Object.assign({ id }, data.attributes) };
+          return {
+            data: {
+              id, ...attributes,
+            },
+          };
         }
 
         case DELETE: {
-          return { data: params.data };
+          return {
+            data: { id: params.id },
+          };
         }
 
         default:
