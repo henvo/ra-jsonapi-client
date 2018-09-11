@@ -137,6 +137,10 @@ export default apiUrl => (type, resource, params) => {
           return { data: Object.assign({ id }, data.attributes) };
         }
 
+        case DELETE: {
+          return { data: params.data };
+        }
+
         default:
           throw new Error(`Unsupported Data Provider request type ${type}`);
       }
