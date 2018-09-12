@@ -1,5 +1,4 @@
 import { stringify } from 'query-string';
-import { fetch } from 'isomorphic-fetch';
 import {
   GET_LIST,
   GET_ONE,
@@ -9,6 +8,10 @@ import {
   GET_MANY,
   GET_MANY_REFERENCE,
 } from './actions';
+
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
+
 
 /**
  * Maps react-admin queries to my REST API
