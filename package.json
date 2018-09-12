@@ -34,6 +34,7 @@
     "nyc": "^13.0.1"
   },
   "dependencies": {
+    "es6-promise": "^4.2.5",
     "isomorphic-fetch": "^2.2.1",
     "query-string": "^6.1.0"
   }
