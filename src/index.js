@@ -1,4 +1,5 @@
 import { stringify } from 'query-string';
+import axios from 'axios';
 import {
   GET_LIST,
   GET_ONE,
@@ -8,9 +9,6 @@ import {
   GET_MANY,
   GET_MANY_REFERENCE,
 } from './actions';
-
-require('es6-promise').polyfill();
-require('isomorphic-fetch');
 
 
 /**
@@ -50,7 +48,7 @@ export default apiUrl => (type, resource, params) => {
     case CREATE:
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
-      options.body = JSON.stringify({
+      options.data = JSON.stringify({
         data: { type: resource, attributes: params.data },
       });
       break;
@@ -58,7 +56,7 @@ export default apiUrl => (type, resource, params) => {
     case UPDATE: {
       url = `${apiUrl}/${resource}/${params.id}`;
 
-      const body = {
+      const data = {
         data: {
           id: params.id,
           type: resource,
@@ -67,7 +65,7 @@ export default apiUrl => (type, resource, params) => {
       };
 
       options.method = 'PUT';
-      options.body = JSON.stringify(body);
+      options.data = JSON.stringify(data);
       break;
     }
 
@@ -103,27 +101,23 @@ export default apiUrl => (type, resource, params) => {
       throw new Error(`Unsupported Data Provider request type ${type}`);
   }
 
-  return fetch(url, options)
-    .then(res => res.text().then((text) => {
-      const json = text.length ? JSON.parse(text) : {};
-      return json;
-    }))
-    .then((json) => {
+  return axios({ url, ...options })
+    .then((response) => {
       switch (type) {
         case GET_LIST: {
           return {
-            data: json.data.map(value => Object.assign(
+            data: response.data.data.map(value => Object.assign(
               { id: value.id },
               value.attributes,
             )),
             // TODO: This is not spec'd by JSON API.
             // Should be read from some kind of config.
-            total: json.meta.total,
+            total: response.data.meta.total,
           };
         }
 
         case GET_ONE: {
-          const { id, attributes } = json.data;
+          const { id, attributes } = response.data.data;
 
           return {
             data: {
@@ -133,7 +127,7 @@ export default apiUrl => (type, resource, params) => {
         }
 
         case CREATE: {
-          const { id, attributes } = json.data;
+          const { id, attributes } = response.data.data;
 
           return {
             data: {
@@ -143,7 +137,7 @@ export default apiUrl => (type, resource, params) => {
         }
 
         case UPDATE: {
-          const { id, attributes } = json.data;
+          const { id, attributes } = response.data.data;
 
           return {
             data: {
