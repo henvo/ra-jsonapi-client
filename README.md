@@ -10,6 +10,7 @@ functionality.
 
 - Allow sorting of collection requests
 - Write tests
+- Allow customization of the `total` attribute
 
 ## Installation
 

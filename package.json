@@ -6,14 +6,15 @@
   "scripts": {
     "build": "babel ./src -d ./build",
     "test": "nyc mocha --require babel-core/register",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/henvo/ra-jsonapi-client.git"
   },
   "keywords": [
-    "rails-react",
+    "react-admin",
     "jsonapi",
     "npm"
   ],
