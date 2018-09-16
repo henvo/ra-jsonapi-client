@@ -6,6 +6,11 @@ A JSONAPI compatible data provider for
 **Disclaimer**: This project is a work in progress and is missing some basic
 functionality.
 
+## TODO
+
+- Allow sorting of collection requests
+- Write tests
+
 ## Installation
 
 ra-jsonapi-client is available from npm.

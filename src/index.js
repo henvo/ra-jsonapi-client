@@ -12,7 +12,7 @@ import {
 
 
 /**
- * Maps react-admin queries to my REST API
+ * Maps react-admin queries to a JSONAPI REST API
  *
  * @param {string} type Request type, e.g GET_LIST
  * @param {string} resource Resource name, e.g. "posts"
