@@ -1,5 +1,5 @@
 import { stringify } from 'query-string';
-import deepmerge from 'deepmerge';
+import merge from 'deepmerge';
 import axios from 'axios';
 import {
   GET_LIST,
@@ -25,13 +25,11 @@ import defaultSettings from './default-settings';
  */
 export default (apiUrl, userSettings = {}) => (type, resource, params) => {
   let url = '';
-  const settings = deepmerge(defaultSettings, userSettings);
+  const settings = merge(defaultSettings, userSettings);
 
   const options = {
-    headers: {
-      Accept: 'application/vnd.api+json; charset=utf-8',
-      'Content-Type': 'application/vnd.api+json; charset=utf-8',
-    },
+    headers: settings.headers,
+    auth: settings.auth,
   };
 
   switch (type) {
