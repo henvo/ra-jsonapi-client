@@ -3,7 +3,7 @@ export default {
     type: 'user',
     id: 1,
     attributes: {
-      name: 'Bob'
+      name: 'Bob',
     },
   },
 };
