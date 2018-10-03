@@ -1,4 +1,5 @@
 import { stringify } from 'query-string';
+import deepmerge from 'deepmerge';
 import axios from 'axios';
 import {
   GET_LIST,
@@ -7,20 +8,24 @@ import {
   UPDATE,
   DELETE,
   GET_MANY,
-  GET_MANY_REFERENCE,
 } from './actions';
 
+import defaultSettings from './default-settings';
 
 /**
  * Maps react-admin queries to a JSONAPI REST API
+ *
+ * @param {string} apiUrl the base URL for the JSONAPI
+ * @param {string} userSettings Settings to configure this client.
  *
  * @param {string} type Request type, e.g GET_LIST
  * @param {string} resource Resource name, e.g. "posts"
  * @param {Object} payload Request parameters. Depends on the request type
  * @returns {Promise} the Promise for a data response
  */
-export default apiUrl => (type, resource, params) => {
+export default (apiUrl, userSettings = {}) => (type, resource, params) => {
   let url = '';
+  const settings = deepmerge(defaultSettings, userSettings);
 
   const options = {
     headers: {
@@ -82,21 +87,6 @@ export default apiUrl => (type, resource, params) => {
       break;
     }
 
-    case GET_MANY_REFERENCE: {
-      const { page, perPage } = params.pagination;
-      const { field, order } = params.sort;
-      const query = {
-        sort: JSON.stringify([field, order]),
-        page: JSON.stringify({ size: perPage, number: page }),
-        filter: JSON.stringify({
-          ...params.filter,
-          [params.target]: params.id,
-        }),
-      };
-      url = `${apiUrl}/${resource}?${stringify(query)}`;
-      break;
-    }
-
     default:
       throw new Error(`Unsupported Data Provider request type ${type}`);
   }
@@ -110,9 +100,7 @@ export default apiUrl => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            // TODO: This is not spec'd by JSON API.
-            // Should be read from some kind of config.
-            total: response.data.meta.total,
+            total: response.data.meta[settings.total],
           };
         }
 

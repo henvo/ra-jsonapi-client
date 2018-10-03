@@ -2,12 +2,15 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import jsonapiClient from '../src/index';
-import getList from './fixtures/get_list';
-import getOne from './fixtures/get_one';
+import getList from './fixtures/get-list';
+import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
 
-const client = jsonapiClient('http://api.example.com');
+const client = jsonapiClient('http://api.example.com', {
+  total: 'total-count',
+});
+
 let result;
 
 describe('GET_LIST', () => {
@@ -36,6 +39,10 @@ describe('GET_LIST', () => {
 
   it('contains valid records', () => {
     expect(result.data).to.deep.include({ id: 1, name: 'Bob' });
+  });
+
+  it('contains a total property', () => {
+    expect(result).to.have.property('total').that.is.equal(5);
   });
 });
 

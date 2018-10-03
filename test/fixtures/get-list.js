@@ -17,6 +17,6 @@ export default {
     },
   ],
   meta: {
-    total: 5,
+    'total-count': 5,
   },
 };
