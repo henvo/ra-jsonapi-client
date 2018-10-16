@@ -133,3 +133,20 @@ describe('DELETE', () => {
     expect(result.data).to.have.property('id').that.is.equal(1);
   });
 });
+
+describe('UNDEFINED', () => {
+  it('throws an error', () => {
+    expect(() => client('UNDEFINED', 'users')).to.throw(Error, /Unsupported/);
+  });
+});
+
+describe('Unauthorized request', () => {
+  beforeEach(() => {
+    nock('http://api.example.com').get('/users/1').reply(401);
+  });
+
+  it('throws an error', () => {
+    expect(() => client('GET_ONE', 'users', { id: 1 }))
+      .to.throw(Error, 'foo');
+  });
+});
