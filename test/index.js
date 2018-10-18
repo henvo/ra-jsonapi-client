@@ -1,11 +1,18 @@
-import { expect } from 'chai';
+import chai from 'chai';
 import nock from 'nock';
+import chaiAsPromised from 'chai-as-promised';
 
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
+
+import { HttpError } from '../src/errors';
+
+chai.use(chaiAsPromised);
+
+const { expect } = chai;
 
 const client = jsonapiClient('http://api.example.com', {
   total: 'total-count',
@@ -146,7 +153,9 @@ describe('Unauthorized request', () => {
   });
 
   it('throws an error', () => {
-    expect(() => client('GET_ONE', 'users', { id: 1 }))
-      .to.throw(Error, 'foo');
+    expect(client('GET_ONE', 'users', { id: 1 }))
+      .to.eventually
+      .be.rejected
+      .and.have.property('status');
   });
 });

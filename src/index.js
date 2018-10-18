@@ -11,7 +11,11 @@ import {
 } from './actions';
 
 import defaultSettings from './default-settings';
-import { HttpError, NotImplementedError } from './errors';
+import { NotImplementedError } from './errors';
+import init from './initializer';
+
+// Set HTTP interceptors.
+init();
 
 /**
  * Maps react-admin queries to a JSONAPI REST API
