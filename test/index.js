@@ -1,11 +1,18 @@
-import { expect } from 'chai';
+import chai from 'chai';
 import nock from 'nock';
+import chaiAsPromised from 'chai-as-promised';
 
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
+
+import { HttpError } from '../src/errors';
+
+chai.use(chaiAsPromised);
+
+const { expect } = chai;
 
 const client = jsonapiClient('http://api.example.com', {
   total: 'total-count',
@@ -131,5 +138,24 @@ describe('DELETE', () => {
 
   it('has record ID', () => {
     expect(result.data).to.have.property('id').that.is.equal(1);
+  });
+});
+
+describe('UNDEFINED', () => {
+  it('throws an error', () => {
+    expect(() => client('UNDEFINED', 'users')).to.throw(Error, /Unsupported/);
+  });
+});
+
+describe('Unauthorized request', () => {
+  beforeEach(() => {
+    nock('http://api.example.com').get('/users/1').reply(401);
+  });
+
+  it('throws an error', () => {
+    expect(client('GET_ONE', 'users', { id: 1 }))
+      .to.eventually
+      .be.rejected
+      .and.have.property('status');
   });
 });

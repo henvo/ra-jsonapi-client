@@ -11,6 +11,11 @@ import {
 } from './actions';
 
 import defaultSettings from './default-settings';
+import { NotImplementedError } from './errors';
+import init from './initializer';
+
+// Set HTTP interceptors.
+init();
 
 /**
  * Maps react-admin queries to a JSONAPI REST API
@@ -86,7 +91,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     }
 
     default:
-      throw new Error(`Unsupported Data Provider request type ${type}`);
+      throw new NotImplementedError(`Unsupported Data Provider request type ${type}`);
   }
 
   return axios({ url, ...options })
@@ -139,7 +144,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         }
 
         default:
-          throw new Error(`Unsupported Data Provider request type ${type}`);
+          throw new NotImplementedError(`Unsupported Data Provider request type ${type}`);
       }
     });
 };

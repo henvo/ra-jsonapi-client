@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "chai-as-promised": "^7.1.1",
     "deepmerge": "^2.1.1",
     "query-string": "^6.1.0"
   }
