@@ -21,7 +21,7 @@ export default () => {
       // as basic auth credentials.
       if (username && password) {
         newConfig.auth.username = username;
-        newConfig.auth.passwors = password;
+        newConfig.auth.password = password;
       }
 
       return newConfig;
