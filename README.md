@@ -76,23 +76,6 @@ Which will work for:
 ```
 If this option is not set it will fall back to `total`.
 
-### Basic auth
-Because this client uses [axios](github.com/axios/axios) you can set
-any HTTP header in the options parameters. For basic auth you can use a
-shortcut:
-
-``` javascript
-const settings = {
-  auth: {
-    username: 'bob',
-    password: 'secret'
-  }
-}
-
-```
-
-The default value is `{}`.
-
 ### Custom HTTP headers
 Custom headers can be set by providing a `headers` object in `options`:
 
@@ -112,8 +95,27 @@ The default value is:
 }
 ```
 
+### Authentication
 
-## TODO
+This client assumes that you are using an
+[authProvider](https://bit.ly/2NSYjS9) for your react-admin
+application. In order to use authentication with your backend your authProvider
+needs to store credentials in localStorage.
 
-* Allow filtering
-* Add all actions
+#### Basic auth
+
+For basic auth your authProvider needs to store username and password like this:
+
+``` javascript
+localStorage.setItem('username', 'bob');
+localStorage.setItem('password', 'secret');
+```
+
+#### Basic auth
+
+For authentication via (access) token your authProvider needs to store the token
+like this:
+
+``` javascript
+localStorage.setItem('token', '123token');
+```
