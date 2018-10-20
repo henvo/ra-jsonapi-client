@@ -8,8 +8,6 @@ import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
 
-import { HttpError } from '../src/errors';
-
 chai.use(chaiAsPromised);
 
 const { expect } = chai;
