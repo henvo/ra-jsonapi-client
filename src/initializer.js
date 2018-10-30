@@ -20,8 +20,7 @@ export default () => {
       // When username and password are available use
       // as basic auth credentials.
       if (username && password) {
-        newConfig.auth.username = username;
-        newConfig.auth.password = password;
+        newConfig.auth = { username, password };
       }
 
       return newConfig;
