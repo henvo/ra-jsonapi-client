@@ -1,4 +1,4 @@
-import { stringify } from 'query-string';
+import { stringify } from 'qs';
 import merge from 'deepmerge';
 import axios from 'axios';
 import {
