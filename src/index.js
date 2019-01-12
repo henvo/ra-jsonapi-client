@@ -39,11 +39,18 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
   switch (type) {
     case GET_LIST: {
       const { page, perPage } = params.pagination;
-      // TODO: Allow sorting, filtering etc.
+
+      // Create query with pagination params.
       const query = {
         'page[number]': page,
         'page[size]': perPage,
       };
+
+      // Add all filter params to query.
+      Object.keys(params.filter).forEach((key) => {
+        query[`filter[${key}]`] = params.filter[key];
+      });
+
       url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
     }
