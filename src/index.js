@@ -47,7 +47,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       };
 
       // Add all filter params to query.
-      Object.keys(params.filter).forEach((key) => {
+      Object.keys(params.filter || {}).forEach((key) => {
         query[`filter[${key}]`] = params.filter[key];
       });
 
