@@ -6,13 +6,15 @@ A JSONAPI compatible data provider for
 
 
 ## Features
-Currently only the basic actions are supported:
+Currently these actions are supported:
 
 * `GET_LIST`
 * `GET_ONE`
 * `CREATE`
 * `UPDATE`
 * `DELETE`
+* `GET_MANY`
+* `GET_MANY_REFERENCE`
 
 ## Installation
 

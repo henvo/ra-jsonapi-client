@@ -4,6 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
+import getManyReference from './fixtures/get-many-reference';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
@@ -26,6 +27,41 @@ describe('GET_LIST', () => {
 
     return client('GET_LIST', 'users', {
       pagination: { page: 1, perPage: 25 },
+    })
+      .then((data) => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has a data property', () => {
+    expect(result).to.have.property('data');
+  });
+
+  it('contains the right count of records', () => {
+    expect(result.data).to.have.lengthOf(5);
+  });
+
+  it('contains valid records', () => {
+    expect(result.data).to.deep.include({ id: 1, name: 'Bob' });
+  });
+
+  it('contains a total property', () => {
+    expect(result).to.have.property('total').that.is.equal(5);
+  });
+});
+
+describe('GET_MANY_REFERENCE', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get(/users.*company_id.*=1/)
+      .reply(200, getManyReference);
+
+    return client('GET_MANY_REFERENCE', 'users', {
+      pagination: { page: 1, perPage: 25 },
+      target: 'company_id',
+      id: 1,
     })
       .then((data) => { result = data; });
   });
