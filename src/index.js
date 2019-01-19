@@ -8,6 +8,7 @@ import {
   UPDATE,
   DELETE,
   GET_MANY,
+  GET_MANY_REFERENCE,
 } from './actions';
 
 import defaultSettings from './default-settings';
@@ -96,6 +97,27 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
     }
 
+    case GET_MANY_REFERENCE: {
+      const { page, perPage } = params.pagination;
+
+      // Create query with pagination params.
+      const query = {
+        'page[number]': page,
+        'page[size]': perPage,
+      };
+
+      // Add all filter params to query.
+      Object.keys(params.filter || {}).forEach((key) => {
+        query[`filter[${key}]`] = params.filter[key];
+      });
+
+      // Add the reference id to the filter params.
+      query[`filter[${params.target}]`] = params.id;
+
+      url = `${apiUrl}/${resource}?${stringify(query)}`;
+      break;
+    }
+
     default:
       throw new NotImplementedError(`Unsupported Data Provider request type ${type}`);
   }
@@ -104,6 +126,16 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     .then((response) => {
       switch (type) {
         case GET_LIST: {
+          return {
+            data: response.data.data.map(value => Object.assign(
+              { id: value.id },
+              value.attributes,
+            )),
+            total: response.data.meta[settings.total],
+          };
+        }
+
+        case GET_MANY_REFERENCE: {
           return {
             data: response.data.data.map(value => Object.assign(
               { id: value.id },
