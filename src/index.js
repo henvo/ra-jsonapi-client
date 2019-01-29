@@ -52,6 +52,12 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         query[`filter[${key}]`] = params.filter[key];
       });
 
+      // Add sort parameter
+      if (params.sort && params.sort.field) {
+        const prefix = params.sort.order === 'ASC' ? '' : '-';
+        query.sort = `${prefix}${params.sort.field}`;
+      }
+
       url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
     }

@@ -22,11 +22,12 @@ let result;
 describe('GET_LIST', () => {
   beforeEach(() => {
     nock('http://api.example.com')
-      .get(/users/)
+      .get(/users.*sort=name.*/)
       .reply(200, getList);
 
     return client('GET_LIST', 'users', {
       pagination: { page: 1, perPage: 25 },
+      sort: { field: 'name', order: 'ASC' },
     })
       .then((data) => { result = data; });
   });
