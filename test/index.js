@@ -8,7 +8,7 @@ import getManyReference from './fixtures/get-many-reference';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
-import getMany from './fixtures/get-Many';
+import getMany from './fixtures/get-many';
 
 chai.use(chaiAsPromised);
 
