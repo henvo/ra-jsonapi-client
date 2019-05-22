@@ -202,7 +202,7 @@ describe('GET_MANY', () => {
       .get(/users.*filter=.*/)
       .reply(200, getMany);
 
-    return client('GET_MANY', 'users', { ids: [ 1] } )
+    return client('GET_MANY', 'users', { ids: [1] } )
       .then((data) => { result = data; });
   });
 

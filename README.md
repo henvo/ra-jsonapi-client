@@ -122,3 +122,6 @@ like this:
 ``` javascript
 localStorage.setItem('token', '123token');
 ```
+
+## Contributors
+* [hootbah](https://github.com/hootbah)
