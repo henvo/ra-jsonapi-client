@@ -8,6 +8,7 @@ import getManyReference from './fixtures/get-many-reference';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
+import getMany from './fixtures/get-many';
 
 chai.use(chaiAsPromised);
 
@@ -192,5 +193,36 @@ describe('Unauthorized request', () => {
       .to.eventually
       .be.rejected
       .and.have.property('status');
+  });
+});
+
+describe('GET_MANY', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get(/users.*filter=.*/)
+      .reply(200, getMany);
+
+    return client('GET_MANY', 'users', { ids: [ 1] } )
+      .then((data) => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has a data property', () => {
+    expect(result).to.have.property('data');
+  });
+
+  it('contains the right count of records', () => {
+    expect(result.data).to.have.lengthOf(1);
+  });
+
+  it('contains valid records', () => {
+    expect(result.data).to.deep.include({ id: 1, name: 'Bob' });
+  });
+
+  it('contains a total property', () => {
+    expect(result).to.have.property('total').that.is.equal(1);
   });
 });
