@@ -1,6 +1,6 @@
 {
   "name": "ra-jsonapi-client",
-  "version": "0.4.11",
+  "version": "0.5.0",
   "description": "JSON API data provider for react-admin.",
   "main": "build/index.js",
   "scripts": {

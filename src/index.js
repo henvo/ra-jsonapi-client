@@ -85,7 +85,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         },
       };
 
-      options.method = 'PUT';
+      options.method = settings.updateMethod;
       options.data = JSON.stringify(data);
       break;
     }

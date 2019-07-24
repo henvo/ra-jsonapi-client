@@ -138,7 +138,7 @@ describe('CREATE', () => {
 describe('UPDATE', () => {
   beforeEach(() => {
     nock('http://api.example.com')
-      .put('/users/1')
+      .patch('/users/1')
       .reply(200, update);
 
     return client('UPDATE', 'users', { id: 1, data: { name: 'Tim' } })

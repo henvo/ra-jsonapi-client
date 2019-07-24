@@ -123,5 +123,18 @@ like this:
 localStorage.setItem('token', '123token');
 ```
 
+### Update method (PUT vs. PATCH)
+First versions used `PUT` as the default update HTTP method.
+In version 0.5.0 this was changed to `PATCH` since it complies with the
+JSONAPI standard.. You can still use `PUT` by declaring the update method in
+the settings:
+
+``` javascript
+{
+  // Set the update method from PATCH to PUT.
+  updateMethod: 'PUT'
+}
+```
+
 ## Contributors
 * [hootbah](https://github.com/hootbah)
