@@ -22,7 +22,7 @@ init();
  * Maps react-admin queries to a JSONAPI REST API
  *
  * @param {string} apiUrl the base URL for the JSONAPI
- * @param {string} userSettings Settings to configure this client.
+ * @param {Object} userSettings Settings to configure this client.
  *
  * @param {string} type Request type, e.g GET_LIST
  * @param {string} resource Resource name, e.g. "posts"
@@ -130,6 +130,26 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
+      // Do some validation of the total parameter if a list was requested
+      let total;
+      if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)){
+        if (settings.total === null){
+          // If the user explicitly provided no total field, then just count the number of objects returned
+          total = response.data.data.length;
+        }
+        else if ('meta' in response.data && settings.total in response.data.meta){
+          // If the user specified a count field, and it's present, then just use that
+          total = response.data.meta[settings.total];
+        }
+        else if (!('meta' in response.data) || !(settings.total in response.data.meta)){
+          // The third option: the server doesn't return a total property at all, so we have to throw an exception
+          throw new Error(`The JSON API response did not contain the field "${settings.total}" in the meta object.
+          Consider either setting the "total" setting to null for default behaviour, changing the "total" setting to 
+          point to the correct meta field, or ensuring your JSON API server is actually returned a "total" meta
+          property.`)
+        }
+      }
+
       switch (type) {
         case GET_MANY:
         case GET_LIST: {
@@ -138,7 +158,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            total: response.data.meta[settings.total],
+            total
           };
         }
 
@@ -148,7 +168,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            total: response.data.meta[settings.total],
+            total
           };
         }
 
