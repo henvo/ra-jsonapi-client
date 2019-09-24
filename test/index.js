@@ -4,6 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
+import getListNoMeta from './fixtures/get-list-no-meta';
 import getManyReference from './fixtures/get-many-reference';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
