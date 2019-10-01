@@ -1,4 +1,4 @@
-import {stringify} from 'qs';
+import { stringify } from 'qs';
 import merge from 'deepmerge';
 import axios from 'axios';
 import {
@@ -12,7 +12,7 @@ import {
 } from './actions';
 
 import defaultSettings from './default-settings';
-import {NotImplementedError} from './errors';
+import { NotImplementedError } from './errors';
 import ResourceLookup from './resourceLookup';
 import init from './initializer';
 

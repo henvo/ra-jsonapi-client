@@ -17,9 +17,9 @@ export default class ResourceLookup {
 
     let resources;
     if (response.hasOwnProperty('included')) {
-      resources = [response.data, ...response.included];
+      resources = [ response.data, ...response.included ];
     } else {
-      resources = [response.data];
+      resources = [ response.data ];
     }
 
     // Iterate over each resource returned and put each in the lookup
