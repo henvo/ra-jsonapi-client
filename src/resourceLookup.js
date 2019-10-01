@@ -78,12 +78,13 @@ export default class ResourceLookup {
     // Deal with relationships
     if (response.hasOwnProperty('relationships')) {
       ret.relationships = {};
-      for (let relationName of Object.keys(response.relationships)) {
-        let relation = response.relationships[relationName].data;
-        if (Array.isArray(relation)) {
-          ret.relationships[relationName] = relation.map(resource => this.unwrapData(this.get(resource)));
-        } else {
-          ret.relationships[relationName] = this.unwrapData(this.get(relation));
+      for (let [ relationName, relation ] of Object.entries(response.relationships)) {
+        if (relation.hasOwnProperty('data')) {
+          if (Array.isArray(relation)) {
+            ret.relationships[relationName] = relation.data.map(resource => this.unwrapData(this.get(resource)));
+          } else {
+            ret.relationships[relationName] = this.unwrapData(this.get(relation.data));
+          }
         }
       }
     }
