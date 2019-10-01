@@ -8,7 +8,7 @@ import {
   UPDATE,
   DELETE,
   GET_MANY,
-  GET_MANY_REFERENCE
+  GET_MANY_REFERENCE,
 } from './actions';
 
 import defaultSettings from './default-settings';
@@ -35,7 +35,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
   const settings = merge(defaultSettings, userSettings);
 
   const options = {
-    headers: settings.headers
+    headers: settings.headers,
   };
 
   switch (type) {
@@ -45,7 +45,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       // Create query with pagination params.
       const query = {
         'page[number]': page,
-        'page[size]': perPage
+        'page[size]': perPage,
       };
 
       // Add all filter params to query.
@@ -71,7 +71,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
       options.data = JSON.stringify({
-        data: { type: resource, attributes: params.data }
+        data: { type: resource, attributes: params.data },
       });
       break;
 
@@ -82,8 +82,8 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         data: {
           id: params.id,
           type: resource,
-          attributes: params.data
-        }
+          attributes: params.data,
+        },
       };
 
       options.method = settings.updateMethod;
@@ -98,7 +98,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
     case GET_MANY: {
       const query = {
-        filter: JSON.stringify({ id: params.ids })
+        filter: JSON.stringify({ id: params.ids }),
       };
       url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
@@ -110,7 +110,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       // Create query with pagination params.
       const query = {
         'page[number]': page,
-        'page[size]': perPage
+        'page[size]': perPage,
       };
 
       // Add all filter params to query.
@@ -139,19 +139,19 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         case GET_LIST:
           return {
             data: response.data.data.map(resource => lookup.unwrapData(resource)),
-            total: response.data.meta[settings.total]
+            total: response.data.meta[settings.total],
           };
 
         case GET_ONE:
         case CREATE:
         case UPDATE:
           return {
-            data: lookup.unwrapData(response.data.data)
+            data: lookup.unwrapData(response.data.data),
           };
 
         case DELETE: {
           return {
-            data: { id: params.id }
+            data: { id: params.id },
           };
         }
 

@@ -70,9 +70,9 @@ export default class ResourceLookup {
     // The base resource object
     const ret = Object.assign(
       {
-        id: response.id
+        id: response.id,
       },
-      response.attributes
+      response.attributes,
     );
 
     // Deal with relationships
