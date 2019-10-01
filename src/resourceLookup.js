@@ -9,24 +9,23 @@ export default class ResourceLookup {
    * @param {Object} response A JSON API response, in JSON format
    */
   constructor(response) {
-    this.lookup = new Map()
+    this.lookup = new Map();
 
     // If the response wasn't a JSON dictionary, we can't and don't need to build a lookup
     if (typeof response !== 'object')
       return;
 
     let resources;
-    if (response.hasOwnProperty('included')){
+    if (response.hasOwnProperty('included')) {
       resources = [response.data, ...response.included];
-    }
-    else {
+    } else {
       resources = [response.data];
     }
 
     // Iterate over each resource returned and put each in the lookup
     for (let entry of resources) {
-      const key = this.getKey(entry)
-      this.lookup.set(key, entry)
+      const key = this.getKey(entry);
+      this.lookup.set(key, entry);
     }
   }
 
@@ -36,7 +35,7 @@ export default class ResourceLookup {
    * @returns {string}
    */
   getKey(resource) {
-    return `${resource.type}:${resource.id}`
+    return `${resource.type}:${resource.id}`;
   }
 
   /**
@@ -48,9 +47,9 @@ export default class ResourceLookup {
     // If we don't have included data for this resource, just return the Resource Linkage object, since that's still
     // useful
     if (this.has(resource)) {
-      return this.lookup.get(this.getKey(resource))
+      return this.lookup.get(this.getKey(resource));
     } else {
-      return resource
+      return resource;
     }
   }
 
@@ -60,7 +59,7 @@ export default class ResourceLookup {
    * @returns {boolean}
    */
   has(resource) {
-    return this.lookup.has(this.getKey(resource))
+    return this.lookup.has(this.getKey(resource));
   }
 
   /**
@@ -74,21 +73,21 @@ export default class ResourceLookup {
         id: response.id
       },
       response.attributes
-    )
+    );
 
     // Deal with relationships
-    if (response.hasOwnProperty("relationships")) {
-      ret.relationships = {}
+    if (response.hasOwnProperty('relationships')) {
+      ret.relationships = {};
       for (let relationName of Object.keys(response.relationships)) {
-        let relation = response.relationships[relationName].data
+        let relation = response.relationships[relationName].data;
         if (Array.isArray(relation)) {
-          ret.relationships[relationName] = relation.map(resource => this.unwrapData(this.get(resource)))
+          ret.relationships[relationName] = relation.map(resource => this.unwrapData(this.get(resource)));
         } else {
-          ret.relationships[relationName] = this.unwrapData(this.get(relation))
+          ret.relationships[relationName] = this.unwrapData(this.get(relation));
         }
       }
     }
 
-    return ret
+    return ret;
   }
 }
