@@ -9,6 +9,9 @@ import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
 import getMany from './fixtures/get-many';
+import getOneLinkage from './fixtures/get-one-relationship-linkage';
+import getOneIncluded from './fixtures/get-one-relationship-included';
+import getManyIncluded from './fixtures/get-many-relationship-included';
 
 chai.use(chaiAsPromised);
 
@@ -109,6 +112,72 @@ describe('GET_ONE', () => {
 
   it('has records attributes', () => {
     expect(result.data).to.have.property('name').that.is.equal('Bob');
+  });
+});
+
+describe('GET_ONE, with a resource linkage', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get('/users/1')
+      .reply(200, getOneLinkage);
+
+    return client('GET_ONE', 'users', { id: 1 })
+      .then((data) => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has record ID', () => {
+    expect(result.data).to.have.property('id').that.is.equal(1);
+  });
+
+  it('has records attributes', () => {
+    expect(result.data).to.have.property('name').that.is.equal('Bob');
+  });
+
+  it('has a relationship field', () => {
+    expect(result.data).to.have.property('relationships').that.is.deep.equal({
+      address: {
+        id: '9'
+      }
+    });
+  });
+});
+
+describe('GET_ONE, with included relationship data', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get('/users/1')
+      .reply(200, getOneIncluded);
+
+    return client('GET_ONE', 'users', { id: 1 })
+      .then(data => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has record ID', () => {
+    expect(result.data).to.have.property('id').that.is.equal(1);
+  });
+
+  it('has records attributes', () => {
+    expect(result.data).to.have.property('name').that.is.equal('Bob');
+  });
+
+  it('has a relationship field', () => {
+    expect(result.data).to.have.property('relationships').that.is.deep.equal({
+      address: {
+        id: '9',
+        street: 'Pinchelone Street',
+        number: 2475,
+        city: 'Norfolk',
+        state: 'VA'
+      }
+    });
   });
 });
 
@@ -220,6 +289,49 @@ describe('GET_MANY', () => {
 
   it('contains valid records', () => {
     expect(result.data).to.deep.include({ id: 1, name: 'Bob' });
+  });
+
+  it('contains a total property', () => {
+    expect(result).to.have.property('total').that.is.equal(1);
+  });
+});
+
+describe('GET_MANY with included relationship data', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get(/users.*filter=.*/)
+      .reply(200, getManyIncluded);
+
+    return client('GET_MANY', 'users', { ids: [1] } )
+      .then((data) => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has a data property', () => {
+    expect(result).to.have.property('data');
+  });
+
+  it('contains the right count of records', () => {
+    expect(result.data).to.have.lengthOf(1);
+  });
+
+  it('contains valid records', () => {
+    expect(result.data).to.deep.include({
+      id: 1,
+      name: 'Bob',
+      relationships: {
+        address: {
+          id: '9',
+          street: 'Pinchelone Street',
+          number: 2475,
+          city: 'Norfolk',
+          state: 'VA'
+        }
+      }
+    });
   });
 
   it('contains a total property', () => {
