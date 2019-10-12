@@ -199,10 +199,10 @@ describe('Unauthorized request', () => {
 describe('GET_MANY', () => {
   beforeEach(() => {
     nock('http://api.example.com')
-      .get(/users.*filter=.*/)
+      .get(/.*filter.*id.*1.*/)
       .reply(200, getMany);
 
-    return client('GET_MANY', 'users', { ids: [1] } )
+    return client('GET_MANY', 'users', { ids: [1, 2] })
       .then((data) => { result = data; });
   });
 

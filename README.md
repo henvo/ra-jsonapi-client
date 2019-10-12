@@ -136,5 +136,11 @@ the settings:
 }
 ```
 
+### Array format for `GET_MANY` filter
+This package makes usage of the aweseome `qs` querystring parsing library.
+
+Default: `brackets`
+Options: `indices`, `repeat`, `comma`
+
 ## Contributors
 * [hootbah](https://github.com/hootbah)
