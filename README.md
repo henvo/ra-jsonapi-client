@@ -79,6 +79,14 @@ Which will work for:
 ```
 If this option is not set it will fall back to `total`.
 
+In addition, if your server doesn't provide a count field, you can set *total
+count* to `null`, and the provider will assume the total count is the same as
+the length of the data array:
+
+``` javascript
+const dataProvider = jsonapiClient('http://localhost:3000', { total: null });
+```
+
 ### Custom HTTP headers
 Custom headers can be set by providing a `headers` object in `options`:
 
@@ -143,4 +151,5 @@ Default: `brackets`
 Options: `indices`, `repeat`, `comma`
 
 ## Contributors
+* [TMiguelT](https://github.com/TMiguelT)
 * [hootbah](https://github.com/hootbah)

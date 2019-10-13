@@ -22,7 +22,7 @@ init();
  * Maps react-admin queries to a JSONAPI REST API
  *
  * @param {string} apiUrl the base URL for the JSONAPI
- * @param {string} userSettings Settings to configure this client.
+ * @param {Object} userSettings Settings to configure this client.
  *
  * @param {string} type Request type, e.g GET_LIST
  * @param {string} resource Resource name, e.g. "posts"
@@ -131,6 +131,20 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
+      let total;
+
+      // For all collection requests get the total count.
+      if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)) {
+        // When meta data and the 'total' setting is provided try
+        // to get the total count.
+        if (response.data.meta && settings.total) {
+          total = response.data.data.length;
+        }
+
+        // Use the length of the data array as a fallback.
+        total = total || response.data.data.length;
+      }
+
       switch (type) {
         case GET_MANY:
         case GET_LIST: {
@@ -139,7 +153,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            total: response.data.meta[settings.total],
+            total,
           };
         }
 
@@ -149,7 +163,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            total: response.data.meta[settings.total],
+            total,
           };
         }
 
