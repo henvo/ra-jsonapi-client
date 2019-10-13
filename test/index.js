@@ -4,6 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
+import getListNoMeta from './fixtures/get-list-no-meta';
 import getManyReference from './fixtures/get-many-reference';
 import getOne from './fixtures/get-one';
 import create from './fixtures/create';
@@ -225,4 +226,38 @@ describe('GET_MANY', () => {
   it('contains a total property', () => {
     expect(result).to.have.property('total').that.is.equal(1);
   });
+});
+
+// This test should work exactly the same as the normal GET_LIST test, but the returned data has no
+// meta  field, and thus no count variable. We set the count variable to null in the client
+describe("GET_LIST with {total: null}", () => {
+  it("contains a total property", () => {
+    nock("http://api.example.com")
+      .get(/users.*sort=name.*/)
+      .reply(200, getListNoMeta)
+
+    const noMetaClient = jsonapiClient("http://api.example.com", {
+      total: null
+    })
+
+    return expect(
+      noMetaClient("GET_LIST", "users", {
+        pagination: {page: 1, perPage: 25},
+        sort: {field: "name", order: "ASC"}
+      })
+    ).to.eventually.have.property("total").that.is.equal(5)
+  })
+});
+
+describe("GET_LIST with incorrect \"total\"", () => {
+  it("throws an Error in this situation", () => {
+    nock("http://api.example.com")
+      .get(/users.*sort=name.*/)
+      .reply(200, getListNoMeta)
+
+    return expect(client("GET_LIST", "users", {
+      pagination: {page: 1, perPage: 25},
+      sort: {field: "name", order: "ASC"}
+    })).to.be.rejectedWith(Error)
+  })
 });
