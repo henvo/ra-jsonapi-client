@@ -131,24 +131,18 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
-      // Do some validation of the total parameter if a list was requested
       let total;
-      if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)){
-        if (settings.total === null){
-          // If the user explicitly provided no total field, then just count the number of objects returned
+
+      // For all collection requests get the total count.
+      if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)) {
+        // When meta data and the 'total' setting is provided try
+        // to get the total count.
+        if (response.data.meta && settings.total) {
           total = response.data.data.length;
         }
-        else if ('meta' in response.data && settings.total in response.data.meta){
-          // If the user specified a count field, and it's present, then just use that
-          total = response.data.meta[settings.total];
-        }
-        else if (!('meta' in response.data) || !(settings.total in response.data.meta)){
-          // The third option: the server doesn't return a total property at all, so we have to throw an exception
-          throw new Error(`The JSON API response did not contain the field "${settings.total}" in the meta object.
-          Consider either setting the "total" setting to null for default behaviour, changing the "total" setting to 
-          point to the correct meta field, or ensuring your JSON API server is actually returned a "total" meta
-          property.`)
-        }
+
+        // Use the length of the data array as a fallback.
+        total = total || response.data.data.length;
       }
 
       switch (type) {
@@ -159,7 +153,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            total
+            total,
           };
         }
 
@@ -169,7 +163,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
               { id: value.id },
               value.attributes,
             )),
-            total
+            total,
           };
         }
 
