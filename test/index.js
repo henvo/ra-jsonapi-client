@@ -5,7 +5,6 @@ import chaiAsPromised from 'chai-as-promised';
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
 import getListNoMeta from './fixtures/get-list-no-meta';
-import getManyReference from './fixtures/get-many-reference';
 import getOne from './fixtures/get-one';
 import getOneLinkage from './fixtures/get-one-relationship-linkage';
 import getOneIncluded from './fixtures/get-one-relationship-included';
@@ -202,7 +201,7 @@ describe('DELETE', () => {
       .reply(204, null);
 
     return client('DELETE', 'users', { id: 1 })
-      .then((data) => {
+      .then(data => {
         result = data;
       });
   });
@@ -251,7 +250,8 @@ describe('Unauthorized request', () => {
   describe(`GET_MANY "${key}"`, () => {
     beforeEach(() => {
       nock('http://api.example.com')
-        .get(/users.*filter=.*/)
+        .get('/users')
+        .query(true)
         .reply(200, response);
 
       return client('GET_MANY', 'users', { ids: [ 1 ] })
