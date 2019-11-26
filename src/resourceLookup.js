@@ -16,13 +16,19 @@ export default class ResourceLookup {
       return;
 
     let resources;
-    if (response.hasOwnProperty('included')) {
-      resources = [ response.data, ...response.included ];
+    // Add the primary data to the lookup array
+    if (response.data instanceof Array) {
+      resources = [ ...response.data ];
     } else {
       resources = [ response.data ];
     }
 
-    // Iterate over each resource returned and put each in the lookup
+    // Add the secondary, included data to the lookup array
+    if (response.hasOwnProperty('included')) {
+      resources = resources.concat(response.included);
+    }
+
+    // Put each resource in the lookup
     for (let entry of resources) {
       const key = this.getKey(entry);
       this.lookup.set(key, entry);

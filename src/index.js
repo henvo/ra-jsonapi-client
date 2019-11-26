@@ -23,7 +23,7 @@ init();
  * Maps react-admin queries to a JSONAPI REST API
  *
  * @param {string} apiUrl the base URL for the JSONAPI
- * @param {string} userSettings Settings to configure this client.
+ * @param {Object} userSettings Settings to configure this client.
  *
  * @param {string} type Request type, e.g GET_LIST
  * @param {string} resource Resource name, e.g. "posts"
@@ -97,10 +97,11 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
 
     case GET_MANY: {
-      const query = {
-        filter: JSON.stringify({ id: params.ids }),
-      };
-      url = `${apiUrl}/${resource}?${stringify(query)}`;
+      const query = stringify({
+        'filter[id]': params.ids,
+      }, { arrayFormat: settings.arrayFormat });
+
+      url = `${apiUrl}/${resource}?${query}`;
       break;
     }
 
@@ -131,7 +132,20 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
+      let total;
       const lookup = new ResourceLookup(response.data);
+
+      // For all collection requests get the total count.
+      if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)) {
+        // When meta data and the 'total' setting is provided try
+        // to get the total count.
+        if (response.data.meta && settings.total) {
+          total = response.data.meta[settings.total];
+        }
+
+        // Use the length of the data array as a fallback.
+        total = total || response.data.data.length;
+      }
 
       switch (type) {
         case GET_MANY:
@@ -139,7 +153,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         case GET_LIST:
           return {
             data: response.data.data.map(resource => lookup.unwrapData(resource)),
-            total: response.data.meta[settings.total],
+            total: total,
           };
 
         case GET_ONE:
