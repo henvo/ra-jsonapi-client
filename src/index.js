@@ -10,10 +10,40 @@ import {
   GET_MANY,
   GET_MANY_REFERENCE,
 } from './actions';
+import { Serializer, Deserializer } from 'jsonapi-serializer';
+
 
 import defaultSettings from './default-settings';
 import { NotImplementedError } from './errors';
 import init from './initializer';
+
+/**
+ * This proxy ensures that every relationship is serialized to an object of the form {id: x}, even if that relationship
+ * doesn't have included data
+ */
+const specialOpts = [ 'transform', 'keyForAttribute', 'id', 'typeAsAttribute' ];
+const relationshipProxy = new Proxy({}, {
+  has(target, key) {
+    // Pretend to have all keys except certain ones with special meanings
+    return !specialOpts.includes(key);
+  },
+  get(target, key, receiver) {
+    if (specialOpts.includes(key)) {
+      return undefined;
+    }
+
+    return {
+      valueForRelationship(data, included) {
+        // If we have actual included data use it, but otherwise just return the id in an object
+        if (included){
+          return included;
+        } else {
+          return { id: data.id };
+        }
+      },
+    };
+  },
+});
 
 // Set HTTP interceptors.
 init();
@@ -69,24 +99,20 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     case CREATE:
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
-      options.data = JSON.stringify({
-        data: { type: resource, attributes: params.data },
-      });
+      options.data = new Serializer(resource, { attributes: Object.keys(params.data) }).serialize(params.data);
+      // options.data = JSON.stringify({
+      //   data: { type: resource, attributes: params.data },
+      // });
       break;
 
     case UPDATE: {
       url = `${apiUrl}/${resource}/${params.id}`;
 
-      const data = {
-        data: {
-          id: params.id,
-          type: resource,
-          attributes: params.data,
-        },
-      };
+      const data = Object.assign({ id: params.id }, params.data);
 
       options.method = settings.updateMethod;
-      options.data = JSON.stringify(data);
+      options.data = new Serializer(resource, { attributes: Object.keys(params.data) }).serialize(data);
+      // options.data = JSON.stringify(data);
       break;
     }
 
@@ -131,76 +157,33 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
-      let total;
-
-      // For all collection requests get the total count.
-      if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)) {
-        // When meta data and the 'total' setting is provided try
-        // to get the total count.
-        if (response.data.meta && settings.total) {
-          total = response.data.meta[settings.total];
-        }
-
-        // Use the length of the data array as a fallback.
-        total = total || response.data.data.length;
-      }
-
       switch (type) {
         case GET_MANY:
+        case GET_MANY_REFERENCE:
         case GET_LIST: {
-          return {
-            data: response.data.data.map(value => Object.assign(
-              { id: value.id },
-              value.attributes,
-            )),
-            total,
-          };
+          // Use the length of the data array as a fallback.
+          let total = response.data.data.length;
+          if (response.data.meta && settings.total) {
+            total = response.data.meta[settings.total];
+          }
+
+          return new Deserializer(relationshipProxy).deserialize(response.data).then(data => {
+            return { data, total };
+          });
         }
-
-        case GET_MANY_REFERENCE: {
-          return {
-            data: response.data.data.map(value => Object.assign(
-              { id: value.id },
-              value.attributes,
-            )),
-            total,
-          };
-        }
-
-        case GET_ONE: {
-          const { id, attributes } = response.data.data;
-
-          return {
-            data: {
-              id, ...attributes,
-            },
-          };
-        }
-
-        case CREATE: {
-          const { id, attributes } = response.data.data;
-
-          return {
-            data: {
-              id, ...attributes,
-            },
-          };
-        }
-
+        case GET_ONE:
+        case CREATE:
         case UPDATE: {
-          const { id, attributes } = response.data.data;
-
-          return {
-            data: {
-              id, ...attributes,
-            },
-          };
+          return new Deserializer(relationshipProxy).deserialize(response.data).then(data => {
+            return { data };
+          });
         }
-
         case DELETE: {
-          return {
-            data: { id: params.id },
-          };
+          return Promise.resolve({
+            data: {
+              id: params.id,
+            },
+          });
         }
 
         default:
