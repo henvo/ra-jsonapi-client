@@ -100,9 +100,6 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
       options.data = new Serializer(resource, { attributes: Object.keys(params.data) }).serialize(params.data);
-      // options.data = JSON.stringify({
-      //   data: { type: resource, attributes: params.data },
-      // });
       break;
 
     case UPDATE: {
@@ -112,7 +109,6 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
       options.method = settings.updateMethod;
       options.data = new Serializer(resource, { attributes: Object.keys(params.data) }).serialize(data);
-      // options.data = JSON.stringify(data);
       break;
     }
 
