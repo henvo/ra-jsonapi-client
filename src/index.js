@@ -13,7 +13,7 @@ import init from './initializer';
 /** This proxy ensures that every relationship is serialized to an object of the form {id: x}, even
  * if that relationship doesn't have included data
  */
-const specialOpts = [ 'transform', 'keyForAttribute', 'id', 'typeAsAttribute' ];
+const specialOpts = ['transform', 'keyForAttribute', 'id', 'typeAsAttribute'];
 const relationshipProxy = new Proxy({}, {
   has(target, key) {
     // Pretend to have all keys except certain ones with special meanings

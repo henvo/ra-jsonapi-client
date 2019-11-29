@@ -31,7 +31,7 @@ export default () => {
   // Response interceptor
   axios.interceptors.response.use(
     response => response,
-    error => {
+    (error) => {
       const { status, message } = error;
 
       if (status < 200 || status >= 300) {
