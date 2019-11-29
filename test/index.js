@@ -125,10 +125,10 @@ describe('GET_MANY_REFERENCE', () => {
 [
   [ 'simple', getOne, {} ],
   [ 'links only', getOneLinks, {} ],
-  [ 'resource linkage', getOneLinkage, { address: { id: '9' } } ],
+  [ 'resource linkage', getOneLinkage, { address: { id: '2' } } ],
   [ 'included data', getOneIncluded, {
     address: {
-      id: '9',
+      id: '2',
       street: 'Pinchelone Street',
       number: 2475,
       city: 'Norfolk',
