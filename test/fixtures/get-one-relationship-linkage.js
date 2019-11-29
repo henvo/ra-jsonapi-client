@@ -7,7 +7,7 @@ export default {
     },
     relationships: {
       address: {
-        data: { type: 'address', id: '9' }
+        data: { type: 'address', id: '2' }
       }
     }
   }

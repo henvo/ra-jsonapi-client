@@ -7,14 +7,14 @@ export default {
     },
     relationships: {
       address: {
-        data: { type: 'address', id: '9' }
+        data: { type: 'address', id: '2' }
       }
     }
   },
   included: [
     {
       type: 'address',
-      id: '9',
+      id: '2',
       attributes: {
         street: 'Pinchelone Street',
         number: 2475,

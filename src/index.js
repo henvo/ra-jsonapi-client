@@ -13,7 +13,7 @@ import init from './initializer';
 /** This proxy ensures that every relationship is serialized to an object of the form {id: x}, even
  * if that relationship doesn't have included data
  */
-const specialOpts = ['transform', 'keyForAttribute', 'id', 'typeAsAttribute'];
+const specialOpts = [ 'transform', 'keyForAttribute', 'id', 'typeAsAttribute' ];
 const relationshipProxy = new Proxy({}, {
   has(target, key) {
     // Pretend to have all keys except certain ones with special meanings
@@ -59,6 +59,12 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     headers: settings.headers,
   };
 
+  function getSerializerOpts() {
+    return Object.assign({
+      attributes: Object.keys(params.data),
+    }, settings.serializerOpts);
+  }
+
   switch (type) {
     case GET_LIST: {
       const { page, perPage } = params.pagination;
@@ -91,9 +97,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     case CREATE:
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
-      options.data = new Serializer(resource, {
-        attributes: Object.keys(params.data),
-      }).serialize(params.data);
+      options.data = new Serializer(resource, getSerializerOpts()).serialize(params.data);
       break;
 
     case UPDATE: {
@@ -102,9 +106,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       const data = Object.assign({ id: params.id }, params.data);
 
       options.method = settings.updateMethod;
-      options.data = new Serializer(resource, {
-        attributes: Object.keys(params.data),
-      }).serialize(data);
+      options.data = new Serializer(resource, getSerializerOpts()).serialize(data);
       break;
     }
 

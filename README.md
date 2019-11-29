@@ -150,6 +150,33 @@ This package makes usage of the aweseome `qs` querystring parsing library.
 Default: `brackets`
 Options: `indices`, `repeat`, `comma`
 
+### Resource-specific serialization
+Since `ra-jsonapi-client` internally uses
+[`jsonapi-serializer`](https://github.com/SeyZ/jsonapi-serializer), you can pass serialization
+options to the serializer using the `serializerOpts` option. This field is itself a dictionary
+that maps resource names to
+[serialization options](https://github.com/SeyZ/jsonapi-serializer#available-serialization-option-opts-argument)
+to use for that resource. You can think of these options as a bit like schemas that describe how
+to serialize that resource.
+
+For example, if you have a `user` resource that has a relationship
+to an `address` resource, you probably want its address attribute to be serialized as a JSON API
+relationship, not just as a regular field. To do that, you might create an options object like this:
+```javascript
+{
+    serializerOpts: {
+        // Options for all "user" resources
+        user: {
+            // Options for the "address" field on a "user"
+            address: {
+                // The ID of an address is given by its id field
+                ref: (user, address) => address.id
+            }
+        }
+    }
+}
+```
+
 ## Contributors
 * [TMiguelT](https://github.com/TMiguelT)
 * [hootbah](https://github.com/hootbah)

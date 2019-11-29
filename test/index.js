@@ -1,6 +1,7 @@
 import chai from 'chai';
 import nock from 'nock';
 import chaiAsPromised from 'chai-as-promised';
+import matches from 'lodash.matches';
 
 import jsonapiClient from '../src/index';
 import getList from './fixtures/get-list';
@@ -24,6 +25,29 @@ const client = jsonapiClient('http://api.example.com', {
 });
 
 let result;
+
+/**
+ * Adds IDs to all resources in the request, to simulate the request being saved to a database
+ */
+function addIds(url, req) {
+  req = JSON.parse(req);
+  let current_id = 1;
+  if (req.data instanceof Array) {
+    for (let datum of req.data) {
+      datum.id = current_id++;
+    }
+  } else {
+    req.data.id = current_id++;
+  }
+
+  if (req.included) {
+    for (let datum of req.included) {
+      datum.id = current_id++;
+    }
+  }
+
+  return req;
+}
 
 describe('GET_LIST', () => {
   beforeEach(() => {
@@ -144,28 +168,72 @@ describe('GET_MANY_REFERENCE', () => {
   });
 });
 
-describe('CREATE', () => {
-  beforeEach(() => {
-    nock('http://api.example.com')
-      .post('/users')
-      .reply(201, create);
+[
+  [
+    'simple',
+    getOne,
+    { name: 'Bob' },
+  ],
+  [
+    'linkage',
+    getOneLinkage,
+    { name: 'Bob', address: { id: '2' } } ],
+  [
+    'included',
+    getOneIncluded,
+    {
+      name: 'Bob',
+      address: {
+        id: '2',
+        street: 'Pinchelone Street',
+        number: 2475,
+        city: 'Norfolk',
+        state: 'VA',
+      },
+    },
+  ],
+].map(([ key, serialized, unserialized ]) => {
+  describe(`CREATE ${key}`, () => {
+    beforeEach(() => {
+      nock('http://api.example.com')
+        .post('/users', body => {
+          // Check that the we serialized correctly
+          return matches(serialized, body);
+        })
+        .reply(201, addIds);
 
-    return client('CREATE', 'users', { data: { name: 'Sarah' } })
-      .then((data) => {
-        result = data;
-      });
-  });
+      return jsonapiClient('http://api.example.com', {
+        serializerOpts: {
+          // Options for all "user" resources
+          user: {
+            // Options for the "address" field on a "user"
+            address: {
+              // The ID of an address is given by its id field
+              ref: (user, address) => address.id,
+            },
+          },
+        },
+      })('CREATE', 'users', {data: unserialized})
+        .then(data => {
+          result = data;
+        });
+    });
 
-  it('returns an object', () => {
-    expect(result).to.be.an('object');
-  });
+    it('returns an object', () => {
+      expect(result).to.be.an('object');
+    });
 
-  it('has record ID', () => {
-    expect(result.data).to.have.property('id').that.is.equal(6);
-  });
+    it('has record ID', () => {
+      expect(result.data).to.have.property('id').that.is.equal(1);
+    });
 
-  it('has records attributes', () => {
-    expect(result.data).to.have.property('name').that.is.equal('Sarah');
+    it('has records attributes', () => {
+      expect(result.data).to.have.property('name').that.is.equal('Bob');
+    });
+
+    it('completed a round trip', () => {
+      expect(result.data).to.deep.include(unserialized);
+    });
   });
 });
 
