@@ -155,7 +155,7 @@ describe('GET_MANY_REFERENCE', () => {
     });
 
     it('has record ID', () => {
-      expect(result.data).to.have.property('id').that.is.equal(1);
+      expect(result.data).to.have.property('id').that.is.equal('1');
     });
 
     it('has records attributes', () => {
