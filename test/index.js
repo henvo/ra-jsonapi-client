@@ -382,13 +382,17 @@ describe('CREATE with custom serializerOpts and deserializerOpts', () => {
 
     const underscoreClient = jsonapiClient('http://api.example.com', {
       serializerOpts: {
-        keyForAttribute: 'underscore_case',
-        data_type: {
-          ref: (outer, inner) => inner.id,
+        data: {
+          keyForAttribute: 'underscore_case',
+          data_type: {
+            ref: (outer, inner) => inner.id,
+          },
         },
       },
       deserializerOpts: {
-        keyForAttribute: 'CamelCase',
+        data: {
+          keyForAttribute: 'CamelCase',
+        },
       },
     });
 

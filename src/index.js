@@ -63,9 +63,10 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
   };
 
   function getSerializerOpts() {
+    const resourceSpecific = settings.serializerOpts[resource] || {};
     return Object.assign({
       attributes: Object.keys(params.data),
-    }, settings.serializerOpts);
+    }, resourceSpecific);
   }
 
   switch (type) {
@@ -154,7 +155,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
-      const opts = new Proxy(settings.deserializerOpts, relationshipProxyHandler);
+      const opts = new Proxy(settings.deserializerOpts[resource] || {}, relationshipProxyHandler);
 
       switch (type) {
         case GET_MANY:
