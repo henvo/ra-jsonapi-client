@@ -14,14 +14,17 @@ import init from './initializer';
  * if that relationship doesn't have included data
  */
 const specialOpts = ['transform', 'keyForAttribute', 'id', 'typeAsAttribute'];
-const relationshipProxy = new Proxy({}, {
+const relationshipProxyHandler = {
   has(target, key) {
     // Pretend to have all keys except certain ones with special meanings
-    return !specialOpts.includes(key);
+    if (specialOpts.includes(key)) {
+      return key in target;
+    }
+    return true;
   },
   get(target, key) {
     if (specialOpts.includes(key)) {
-      return undefined;
+      return target[key];
     }
 
     return {
@@ -35,7 +38,7 @@ const relationshipProxy = new Proxy({}, {
       },
     };
   },
-});
+};
 
 // Set HTTP interceptors.
 init();
@@ -151,6 +154,8 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   return axios({ url, ...options })
     .then((response) => {
+      const opts = new Proxy(settings.deserializerOpts, relationshipProxyHandler);
+
       switch (type) {
         case GET_MANY:
         case GET_MANY_REFERENCE:
@@ -161,14 +166,14 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
             total = response.data.meta[settings.total];
           }
 
-          return new Deserializer(relationshipProxy).deserialize(response.data).then(
+          return new Deserializer(opts).deserialize(response.data).then(
             data => ({ data, total }),
           );
         }
         case GET_ONE:
         case CREATE:
         case UPDATE: {
-          return new Deserializer(relationshipProxy).deserialize(response.data).then(
+          return new Deserializer(opts).deserialize(response.data).then(
             data => ({ data }),
           );
         }

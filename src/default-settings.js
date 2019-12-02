@@ -7,4 +7,5 @@ export default {
   updateMethod: 'PATCH',
   arrayFormat: 'brackets',
   serializerOpts: {},
+  deserializerOpts: {},
 };

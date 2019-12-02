@@ -123,10 +123,10 @@ describe('GET_MANY_REFERENCE', () => {
 });
 
 [
-  [ 'simple', getOne, {} ],
-  [ 'links only', getOneLinks, {} ],
-  [ 'resource linkage', getOneLinkage, { address: { id: '2' } } ],
-  [ 'included data', getOneIncluded, {
+  ['simple', getOne, {}],
+  ['links only', getOneLinks, {}],
+  ['resource linkage', getOneLinkage, { address: { id: '2' } }],
+  ['included data', getOneIncluded, {
     address: {
       id: '2',
       street: 'Pinchelone Street',
@@ -136,7 +136,7 @@ describe('GET_MANY_REFERENCE', () => {
     },
   },
   ],
-].map(([ key, response, relationships ]) => {
+].map(([key, response, relationships]) => {
   describe(`GET_ONE "${key}"`, () => {
 
     beforeEach(() => {
@@ -177,7 +177,7 @@ describe('GET_MANY_REFERENCE', () => {
   [
     'linkage',
     getOneLinkage,
-    { name: 'Bob', address: { id: '2' } } ],
+    { name: 'Bob', address: { id: '2' } }],
   [
     'included',
     getOneIncluded,
@@ -192,7 +192,7 @@ describe('GET_MANY_REFERENCE', () => {
       },
     },
   ],
-].map(([ key, serialized, unserialized ]) => {
+].map(([key, serialized, unserialized]) => {
   describe(`CREATE ${key}`, () => {
     beforeEach(() => {
       nock('http://api.example.com')
@@ -213,7 +213,7 @@ describe('GET_MANY_REFERENCE', () => {
             },
           },
         },
-      })('CREATE', 'users', {data: unserialized})
+      })('CREATE', 'users', { data: unserialized })
         .then(data => {
           result = data;
         });
@@ -303,8 +303,8 @@ describe('Unauthorized request', () => {
 });
 
 [
-  [ 'simple', getMany, {} ],
-  [ 'included data', getManyIncluded, {
+  ['simple', getMany, {}],
+  ['included data', getManyIncluded, {
     address: {
       id: '9',
       street: 'Pinchelone Street',
@@ -314,7 +314,7 @@ describe('Unauthorized request', () => {
     },
   },
   ],
-].map(([ key, response, relationships ]) => {
+].map(([key, response, relationships]) => {
   describe(`GET_MANY "${key}"`, () => {
     beforeEach(() => {
       nock('http://api.example.com')
@@ -322,7 +322,7 @@ describe('Unauthorized request', () => {
         .query(true)
         .reply(200, response);
 
-      return client('GET_MANY', 'users', { ids: [ 1 ] })
+      return client('GET_MANY', 'users', { ids: [1] })
         .then((data) => {
           result = data;
         });
@@ -371,5 +371,42 @@ describe('GET_LIST with {total: null}', () => {
       pagination: { page: 1, perPage: 25 },
       sort: { field: 'name', order: 'ASC' },
     })).to.eventually.have.property('total').that.is.equal(5);
+  });
+});
+
+describe('CREATE with custom serializerOpts and deserializerOpts', () => {
+  it('loads an underscore_case relationship, and deserializes it to CamelCase', () => {
+    nock('http://api.example.com')
+      .post('/data')
+      .reply(200, addIds);
+
+    const underscoreClient = jsonapiClient('http://api.example.com', {
+      serializerOpts: {
+        keyForAttribute: 'underscore_case',
+        data_type: {
+          ref: (outer, inner) => inner.id,
+        },
+      },
+      deserializerOpts: {
+        keyForAttribute: 'CamelCase',
+      },
+    });
+
+    return underscoreClient('CREATE', 'data', {
+      data: {
+        value: 23,
+        data_type: {
+          id: 2,
+        },
+      },
+    }).then((response) => {
+      expect(response.data).to.deep.equal({
+        id: 1,
+        Value: 23,
+        DataType: {
+          id: 2,
+        },
+      });
+    });
   });
 });
