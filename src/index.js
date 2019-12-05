@@ -23,11 +23,15 @@ const relationshipProxyHandler = {
     return true;
   },
   get(target, key) {
+    const fallback = target[key];
+
+    // Use the fallback for special options
     if (specialOpts.includes(key)) {
-      return target[key];
+      return fallback;
     }
 
-    return {
+    // Merge the fallback with this object for per-resource settings
+    return Object.assign({
       valueForRelationship(data, included) {
         // If we have actual included data use it, but otherwise just return the id in an object
         if (included) {
@@ -36,7 +40,7 @@ const relationshipProxyHandler = {
 
         return { id: data.id };
       },
-    };
+    }, fallback || {});
   },
 };
 
