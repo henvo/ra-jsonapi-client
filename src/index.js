@@ -13,7 +13,7 @@ import init from './initializer';
 /** This proxy ensures that every relationship is serialized to an object of the form {id: x}, even
  * if that relationship doesn't have included data
  */
-const specialOpts = ['transform', 'keyForAttribute', 'id', 'typeAsAttribute'];
+const specialOpts = ['transform', 'keyForAttribute', 'id', 'typeAsAttribute', 'links'];
 const relationshipProxyHandler = {
   has(target, key) {
     // Pretend to have all keys except certain ones with special meanings
@@ -68,8 +68,14 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
   function getSerializerOpts() {
     const resourceSpecific = settings.serializerOpts[resource] || {};
+
+    // By default, assume the user wants to serialize all keys except links, in case that's
+    // a leftover from a deserialized resource
+    const attributes = new Set(Object.keys(params.data));
+    attributes.delete('links');
+
     return Object.assign({
-      attributes: Object.keys(params.data),
+      attributes: [...attributes],
     }, resourceSpecific);
   }
 

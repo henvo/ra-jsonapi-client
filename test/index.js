@@ -10,6 +10,7 @@ import getOne from './fixtures/get-one';
 import getOneLinkage from './fixtures/get-one-relationship-linkage';
 import getOneIncluded from './fixtures/get-one-relationship-included';
 import getOneLinks from './fixtures/get-one-relationship-links';
+import getOneDataLinks from './fixtures/get-one-data-links';
 import create from './fixtures/create';
 import update from './fixtures/update';
 import getMany from './fixtures/get-many';
@@ -50,6 +51,9 @@ function addIds(url, req) {
 }
 
 describe('GET_LIST', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   beforeEach(() => {
     nock('http://api.example.com')
       .get(/users.*sort=name.*/)
@@ -86,6 +90,9 @@ describe('GET_LIST', () => {
 });
 
 describe('GET_MANY_REFERENCE', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   beforeEach(() => {
     nock('http://api.example.com')
       .get(/users.*company_id.*=1/)
@@ -138,6 +145,9 @@ describe('GET_MANY_REFERENCE', () => {
   ],
 ].map(([key, response, relationships]) => {
   describe(`GET_ONE "${key}"`, () => {
+    after(() => {
+      nock.cleanAll();
+    });
 
     beforeEach(() => {
       nock('http://api.example.com')
@@ -168,6 +178,31 @@ describe('GET_MANY_REFERENCE', () => {
   });
 });
 
+describe('CREATE with data links', () => {
+  after(() => {
+    nock.cleanAll();
+  });
+
+  it('does not include the links object in the serialized result', () => {
+    // (links are only for the JSON API serialized form)
+    nock('http://api.example.com')
+      .post('/users', (body) => {
+        return !('links' in body.data.attributes);
+      })
+      .reply(201, addIds);
+
+    return client('CREATE', 'users', {
+      data: {
+        name: 'Bob',
+        id: 1,
+        links: {
+          self: '/user/1',
+        },
+      },
+    });
+  });
+});
+
 [
   [
     'simple',
@@ -194,6 +229,9 @@ describe('GET_MANY_REFERENCE', () => {
   ],
 ].map(([key, serialized, unserialized]) => {
   describe(`CREATE ${key}`, () => {
+    after(() => {
+      nock.cleanAll();
+    });
     beforeEach(() => {
       nock('http://api.example.com')
         .post('/users', body => {
@@ -238,6 +276,9 @@ describe('GET_MANY_REFERENCE', () => {
 });
 
 describe('UPDATE', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   beforeEach(() => {
     nock('http://api.example.com')
       .patch('/users/1')
@@ -263,6 +304,9 @@ describe('UPDATE', () => {
 });
 
 describe('DELETE', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   beforeEach(() => {
     nock('http://api.example.com')
       .delete('/users/1')
@@ -290,6 +334,9 @@ describe('UNDEFINED', () => {
 });
 
 describe('Unauthorized request', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   beforeEach(() => {
     nock('http://api.example.com').get('/users/1').reply(401);
   });
@@ -316,6 +363,9 @@ describe('Unauthorized request', () => {
   ],
 ].map(([key, response, relationships]) => {
   describe(`GET_MANY "${key}"`, () => {
+    after(() => {
+      nock.cleanAll();
+    });
     beforeEach(() => {
       nock('http://api.example.com')
         .get('/users')
@@ -358,6 +408,9 @@ describe('Unauthorized request', () => {
 // returned data has no meta field, and thus no count variable. We set the
 // count variable to null in the client
 describe('GET_LIST with {total: null}', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   it('contains a total property', () => {
     nock('http://api.example.com')
       .get(/users.*sort=name.*/)
@@ -375,6 +428,9 @@ describe('GET_LIST with {total: null}', () => {
 });
 
 describe('CREATE with custom serializerOpts and deserializerOpts', () => {
+  after(() => {
+    nock.cleanAll();
+  });
   it('loads an underscore_case relationship, and deserializes it to CamelCase', () => {
     nock('http://api.example.com')
       .post('/data')
