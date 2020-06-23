@@ -77,11 +77,14 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     case UPDATE: {
       url = `${apiUrl}/${resource}/${params.id}`;
 
+      var attributes = params.data
+      delete attributes.id;
+      
       const data = {
         data: {
           id: params.id,
           type: resource,
-          attributes: params.data,
+          attributes: attributes,
         },
       };
 
