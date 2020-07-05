@@ -153,3 +153,4 @@ Options: `indices`, `repeat`, `comma`
 ## Contributors
 * [TMiguelT](https://github.com/TMiguelT)
 * [hootbah](https://github.com/hootbah)
+* [770studio](https://github.com/770studio)
