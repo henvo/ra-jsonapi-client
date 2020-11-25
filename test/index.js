@@ -90,6 +90,78 @@ describe('GET_MANY_REFERENCE', () => {
   });
 });
 
+describe('GET_MANY_REFERENCE with ASC sort', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get('/users?page%5Bnumber%5D=1&page%5Bsize%5D=25&filter%5Bcompany_id%5D=1&sort=name')
+      .reply(200, getManyReference);
+
+    return client('GET_MANY_REFERENCE', 'users', {
+      pagination: { page: 1, perPage: 25 },
+      sort: { field: 'name', order: 'ASC' },
+      target: 'company_id',
+      id: 1,
+    })
+      .then((data) => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has a data property', () => {
+    expect(result).to.have.property('data');
+  });
+
+  it('contains the right count of records', () => {
+    expect(result.data).to.have.lengthOf(5);
+  });
+
+  it('contains valid records', () => {
+    expect(result.data).to.deep.include({ id: 1, name: 'Bob' });
+  });
+
+  it('contains a total property', () => {
+    expect(result).to.have.property('total').that.is.equal(5);
+  });
+});
+
+describe('GET_MANY_REFERENCE with DESC sort', () => {
+  beforeEach(() => {
+    nock('http://api.example.com')
+      .get('/users?page%5Bnumber%5D=1&page%5Bsize%5D=25&filter%5Bcompany_id%5D=1&sort=-name')
+      .reply(200, getManyReference);
+
+    return client('GET_MANY_REFERENCE', 'users', {
+      pagination: { page: 1, perPage: 25 },
+      sort: { field: 'name', order: 'DESC' },
+      target: 'company_id',
+      id: 1,
+    })
+      .then((data) => { result = data; });
+  });
+
+  it('returns an object', () => {
+    expect(result).to.be.an('object');
+  });
+
+  it('has a data property', () => {
+    expect(result).to.have.property('data');
+  });
+
+  it('contains the right count of records', () => {
+    expect(result.data).to.have.lengthOf(5);
+  });
+
+  it('contains valid records', () => {
+    expect(result.data).to.deep.include({ id: 1, name: 'Bob' });
+  });
+
+  it('contains a total property', () => {
+    expect(result).to.have.property('total').that.is.equal(5);
+  });
+});
+
 describe('GET_ONE', () => {
   beforeEach(() => {
     nock('http://api.example.com')
