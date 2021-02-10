@@ -124,6 +124,12 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       // Add the reference id to the filter params.
       query[`filter[${params.target}]`] = params.id;
 
+      // Add sort parameter
+      if (params.sort && params.sort.field) {
+        const prefix = params.sort.order === 'ASC' ? '' : '-';
+        query.sort = `${prefix}${params.sort.field}`;
+      }
+
       url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
     }

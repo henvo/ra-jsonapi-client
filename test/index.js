@@ -58,11 +58,12 @@ describe('GET_LIST', () => {
 describe('GET_MANY_REFERENCE', () => {
   beforeEach(() => {
     nock('http://api.example.com')
-      .get(/users.*company_id.*=1/)
+      .get(/users.*company_id.*=1.*sort=-name.*/)
       .reply(200, getManyReference);
 
     return client('GET_MANY_REFERENCE', 'users', {
       pagination: { page: 1, perPage: 25 },
+      sort: { field: 'name', order: 'DESC' },
       target: 'company_id',
       id: 1,
     })

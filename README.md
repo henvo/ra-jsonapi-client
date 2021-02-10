@@ -154,3 +154,4 @@ Options: `indices`, `repeat`, `comma`
 * [TMiguelT](https://github.com/TMiguelT)
 * [hootbah](https://github.com/hootbah)
 * [770studio](https://github.com/770studio)
+* [foxeg](https://github.com/foxeg)
