@@ -1,6 +1,6 @@
 {
   "name": "ra-jsonapi-client",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "JSON API data provider for react-admin.",
   "main": "build/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "jsonapi",
     "npm"
   ],
-  "author": "Henning Vogt <git@henvo.de>",
+  "author": "Henning Vogt <henning@vogt.family>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/henvo/ra-jsonapi-client/issues"
