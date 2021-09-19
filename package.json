@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "babel ./src -d ./build",
-    "test": "nyc mocha --require babel-core/register --require mock-local-storage",
+    "test": "mocha --require mock-local-storage --require @babel/register test/index.js",
     "lint": "eslint ./src",
     "prepublishOnly": "npm run build"
   },
@@ -25,9 +25,11 @@
   },
   "homepage": "https://github.com/henvo/ra-jsonapi-client#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.15.6",
+    "@babel/preset-env": "^7.15.6",
+    "@babel/register": "^7.15.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^5.5.0",
