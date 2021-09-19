@@ -1,5 +1,5 @@
 # ra-jsonapi-client
-[![Build Status](https://travis-ci.org/henvo/ra-jsonapi-client.svg?branch=master)](https://travis-ci.org/henvo/ra-jsonapi-client)
+[![CircleCI](https://circleci.com/gh/henvo/ra-jsonapi-client/tree/master.svg?style=svg)](https://circleci.com/gh/henvo/ra-jsonapi-client/tree/master)
 [![npm version](https://badge.fury.io/js/ra-jsonapi-client.svg)](https://badge.fury.io/js/ra-jsonapi-client)
 
 A JSONAPI compatible data provider for
