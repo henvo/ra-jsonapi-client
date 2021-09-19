@@ -6,6 +6,7 @@
   "scripts": {
     "build": "babel ./src -d ./build",
     "test": "mocha --require mock-local-storage --require @babel/register test/index.js",
+    "coverage": "nyc npm run test",
     "lint": "eslint ./src",
     "prepublishOnly": "npm run build"
   },
