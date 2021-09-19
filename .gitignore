@@ -1,5 +1,6 @@
 build/
 node_modules/
 .nyc_output/
+.yarn-error.log
 
 npm-debug.log
