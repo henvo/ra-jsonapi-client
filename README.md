@@ -150,8 +150,26 @@ This package makes usage of the aweseome `qs` querystring parsing library.
 Default: `brackets`
 Options: `indices`, `repeat`, `comma`
 
+### Relationships Map
+
+If you need to work with relationships you will need to declare these in order for the data provider to be able to serialize your data.
+
+For example: say you're working with `projects` and those projects have an `owner` and `collaborators`. When you create those `projects` the data provider will have no way to know those related objects are `users` when serializing so we'll need to specify the `owner` and each object found within the `collaborators` array are to be serialized with `type` equal to `users`.
+
+```js
+{
+  relationshipsMap: {
+    projects: {
+      owner: 'users', // project.owner is serialized with { type: 'users' }
+      collaborators: 'users' // project.collaborators is serialized with { type: 'users' }
+    }
+  }
+}
+```
+
 ## Contributors
 * [TMiguelT](https://github.com/TMiguelT)
 * [hootbah](https://github.com/hootbah)
 * [770studio](https://github.com/770studio)
 * [foxeg](https://github.com/foxeg)
+* [mrnkr](https://github.com/mrnkr)

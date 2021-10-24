@@ -6,4 +6,5 @@ export default {
   },
   updateMethod: 'PATCH',
   arrayFormat: 'brackets',
+  relationshipsMap: {},
 };

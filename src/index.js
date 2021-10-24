@@ -10,7 +10,8 @@ import {
   GET_MANY,
   GET_MANY_REFERENCE,
 } from './actions';
-
+import deserialize from './deserializer';
+import makeSerializer from './serializer';
 import defaultSettings from './default-settings';
 import { NotImplementedError } from './errors';
 import init from './initializer';
@@ -32,6 +33,8 @@ init();
 export default (apiUrl, userSettings = {}) => (type, resource, params) => {
   let url = '';
   const settings = merge(defaultSettings, userSettings);
+
+  const serialize = makeSerializer(settings.relationshipsMap);
 
   const options = {
     headers: settings.headers,
@@ -69,27 +72,13 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     case CREATE:
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
-      options.data = JSON.stringify({
-        data: { type: resource, attributes: params.data },
-      });
+      options.data = serialize(resource, params.data);
       break;
 
     case UPDATE: {
       url = `${apiUrl}/${resource}/${params.id}`;
-
-      const attributes = params.data;
-      delete attributes.id;
-
-      const data = {
-        data: {
-          id: params.id,
-          type: resource,
-          attributes,
-        },
-      };
-
       options.method = settings.updateMethod;
-      options.data = JSON.stringify(data);
+      options.data = serialize(resource, params.data);
       break;
     }
 
@@ -156,55 +145,12 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
       switch (type) {
         case GET_MANY:
-        case GET_LIST: {
-          return {
-            data: response.data.data.map(value => Object.assign(
-              { id: value.id },
-              value.attributes,
-            )),
-            total,
-          };
-        }
-
-        case GET_MANY_REFERENCE: {
-          return {
-            data: response.data.data.map(value => Object.assign(
-              { id: value.id },
-              value.attributes,
-            )),
-            total,
-          };
-        }
-
-        case GET_ONE: {
-          const { id, attributes } = response.data.data;
-
-          return {
-            data: {
-              id, ...attributes,
-            },
-          };
-        }
-
-        case CREATE: {
-          const { id, attributes } = response.data.data;
-
-          return {
-            data: {
-              id, ...attributes,
-            },
-          };
-        }
-
-        case UPDATE: {
-          const { id, attributes } = response.data.data;
-
-          return {
-            data: {
-              id, ...attributes,
-            },
-          };
-        }
+        case GET_LIST:
+        case GET_MANY_REFERENCE:
+        case GET_ONE:
+        case CREATE:
+        case UPDATE:
+          return deserialize(response.data, total);
 
         case DELETE: {
           return {
