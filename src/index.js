@@ -40,15 +40,18 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     headers: settings.headers,
   };
 
-  switch (type) {
-    case GET_LIST: {
-      const { page, perPage } = params.pagination;
+  const include = Object.keys(settings.relationshipsMap?.[resource] ?? {}).join(',');
 
-      // Create query with pagination params.
-      const query = {
-        'page[number]': page,
-        'page[size]': perPage,
-      };
+  const query = {
+    include: include !== '' ? include : undefined,
+  };
+
+  switch (type) {
+    case GET_LIST:
+    case GET_MANY_REFERENCE:
+      // Create query with pagination params and include declared relationships.
+      query['page[number]'] = params.pagination.page;
+      query['page[size]'] = params.pagination.perPage;
 
       // Add all filter params to query.
       Object.keys(params.filter || {}).forEach((key) => {
@@ -63,11 +66,12 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
       url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
-    }
 
-    case GET_ONE:
-      url = `${apiUrl}/${resource}/${params.id}`;
+    case GET_ONE: {
+      const queryString = stringify(query);
+      url = `${apiUrl}/${resource}/${params.id}${queryString !== '' ? `?${queryString}` : ''}`;
       break;
+    }
 
     case CREATE:
       url = `${apiUrl}/${resource}`;
@@ -88,38 +92,9 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
 
     case GET_MANY: {
-      const query = stringify({
-        'filter[id]': params.ids,
-      }, { arrayFormat: settings.arrayFormat });
+      query['filter[id]'] = params.ids;
 
-      url = `${apiUrl}/${resource}?${query}`;
-      break;
-    }
-
-    case GET_MANY_REFERENCE: {
-      const { page, perPage } = params.pagination;
-
-      // Create query with pagination params.
-      const query = {
-        'page[number]': page,
-        'page[size]': perPage,
-      };
-
-      // Add all filter params to query.
-      Object.keys(params.filter || {}).forEach((key) => {
-        query[`filter[${key}]`] = params.filter[key];
-      });
-
-      // Add the reference id to the filter params.
-      query[`filter[${params.target}]`] = params.id;
-
-      // Add sort parameter
-      if (params.sort && params.sort.field) {
-        const prefix = params.sort.order === 'ASC' ? '' : '-';
-        query.sort = `${prefix}${params.sort.field}`;
-      }
-
-      url = `${apiUrl}/${resource}?${stringify(query)}`;
+      url = `${apiUrl}/${resource}?${stringify(query, { arrayFormat: settings.arrayFormat })}`;
       break;
     }
 
