@@ -58,6 +58,11 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         query[`filter[${key}]`] = params.filter[key];
       });
 
+      if (type === GET_MANY_REFERENCE) {
+        // Add the reference id to the filter params.
+        query[`filter[${params.target}]`] = params.id;
+      }
+
       // Add sort parameter
       if (params.sort && params.sort.field) {
         const prefix = params.sort.order === 'ASC' ? '' : '-';
