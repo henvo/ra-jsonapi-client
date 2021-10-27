@@ -53,8 +53,9 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       query['page[number]'] = params.pagination.page;
       query['page[size]'] = params.pagination.perPage;
 
-      // Add all filter params to query.
-      query.filter = params.filter;
+      // https://www.jsonapi.net/usage/reading/filtering.html
+      // Send an object containing a JSON API compliant query in its raw property
+      query.filter = params.filter.raw;
 
       // Add sort parameter
       if (params.sort && params.sort.field) {
@@ -90,7 +91,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
 
     case GET_MANY: {
-      query.filter = params.filter;
+      query.filter = `any(id,${params.ids.reduce((acum, cur) => `${acum.length ? `${acum},` : ''}'${cur}'`, '')})`;
 
       url = `${apiUrl}/${resource}?${stringify(query, { arrayFormat: settings.arrayFormat })}`;
       break;
