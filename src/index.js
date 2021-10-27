@@ -54,9 +54,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       query['page[size]'] = params.pagination.perPage;
 
       // Add all filter params to query.
-      Object.keys(params.filter || {}).forEach((key) => {
-        query[`filter[${key}]`] = params.filter[key];
-      });
+      query.filter = params.filter;
 
       // Add sort parameter
       if (params.sort && params.sort.field) {
@@ -92,7 +90,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
 
     case GET_MANY: {
-      query['filter[id]'] = params.ids;
+      query.filter = params.filter;
 
       url = `${apiUrl}/${resource}?${stringify(query, { arrayFormat: settings.arrayFormat })}`;
       break;
