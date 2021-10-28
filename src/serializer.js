@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
+import isObject from './utils';
+
 export default relationshipsMap => (type, { id, ...objectToSerialize }) => {
-  const isObject = obj => JSON.stringify(obj).startsWith('{');
   const isRelationship = key => !!relationshipsMap[type]?.[key];
 
   return JSON.stringify({
