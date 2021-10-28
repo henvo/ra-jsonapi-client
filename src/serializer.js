@@ -8,10 +8,12 @@ const splitAttributesAndRelationships = (type, objectToSerialize, relationshipsM
         ...acum,
         relationships: {
           ...(acum.relationships ?? {}),
-          [key]: value.map(val => ({
-            type: relationshipsMap[type][key],
-            id: val.id,
-          })),
+          [key]: {
+            data: value.map(val => ({
+              type: relationshipsMap[type][key],
+              id: val.id,
+            })),
+          },
         },
       };
     }
@@ -22,8 +24,10 @@ const splitAttributesAndRelationships = (type, objectToSerialize, relationshipsM
         relationships: {
           ...(acum.relationships ?? {}),
           [key]: {
-            type: relationshipsMap[type][key],
-            id: value.id,
+            data: {
+              type: relationshipsMap[type][key],
+              id: value.id,
+            },
           },
         },
       };
