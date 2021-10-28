@@ -15,6 +15,9 @@ import makeSerializer from './serializer';
 import defaultSettings from './default-settings';
 import { NotImplementedError } from './errors';
 import init from './initializer';
+import {
+  makeFilter, combineFilters, makeReferenceFilter, parseIdsFilter,
+} from './filter';
 
 // Set HTTP interceptors.
 init();
@@ -55,12 +58,11 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
       // https://www.jsonapi.net/usage/reading/filtering.html
       // Send an object containing a JSON API compliant query in its raw property
-      query.filter = params.filter.raw;
+      query.filter = makeFilter(params);
 
       if (type === GET_MANY_REFERENCE) {
         // Add the reference id to the filter params.
-        const referenceFilter = `eq(${params.target},'${params.id}')`;
-        query.filter = query.filter?.length ? `and(${query.filter},${referenceFilter})` : referenceFilter;
+        query.filter = combineFilters(makeReferenceFilter(params), query.filter);
       }
 
       // Add sort parameter
@@ -81,7 +83,11 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     case CREATE:
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
-      options.data = serialize(resource, params.data);
+      try {
+        options.data = serialize(resource, params.data);
+      } catch (err) {
+        console.log(err);
+      }
       break;
 
     case UPDATE: {
@@ -97,9 +103,8 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
 
     case GET_MANY: {
-      query.filter = params.ids.length > 1 ? `any(id,${params.ids.reduce((acum, cur) => `${acum.length ? `${acum},` : ''}'${cur}'`, '')})` : `eq(id,${params.ids[0]})`;
-
-      url = `${apiUrl}/${resource}?${stringify(query, { arrayFormat: settings.arrayFormat })}`;
+      query.filter = parseIdsFilter(params);
+      url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
     }
 

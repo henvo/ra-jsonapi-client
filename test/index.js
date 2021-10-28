@@ -3,6 +3,7 @@ import nock from 'nock';
 import chaiAsPromised from 'chai-as-promised';
 
 import jsonapiClient from '../src/index';
+import makeSerializer from '../src/serializer';
 import getList from './fixtures/get-list';
 import getListNoMeta from './fixtures/get-list-no-meta';
 import getManyReference from './fixtures/get-many-reference';
@@ -66,7 +67,7 @@ describe('GET_LIST', () => {
 describe('GET_MANY_REFERENCE', () => {
   beforeEach(() => {
     nock('http://api.example.com')
-      .get(/users.*company_id.*=1.*sort=-name.*/)
+      .get(/users.*company_id.*1.*sort=-name.*/)
       .reply(200, getManyReference);
 
     return client('GET_MANY_REFERENCE', 'users', {
@@ -340,5 +341,77 @@ describe('GET_LIST with {total: null}', () => {
       pagination: { page: 1, perPage: 25 },
       sort: { field: 'name', order: 'ASC' },
     })).to.eventually.have.property('total').that.is.equal(5);
+  });
+});
+
+describe('serializer', () => {
+  const serializer = makeSerializer({
+    projects: {
+      owner: 'users',
+      collaborators: 'users',
+    },
+  });
+
+  const expected = {
+    data: {
+      type: 'projects',
+      id: '2',
+      attributes: {
+        name: 'Test project',
+      },
+      relationships: {
+        owner: {
+          data: {
+            type: 'users',
+            id: '3',
+          },
+        },
+        collaborators: {
+          data: [
+            {
+              type: 'users',
+              id: '4',
+            },
+            {
+              type: 'users',
+              id: '5',
+            },
+          ],
+        },
+      },
+    },
+  };
+
+  it('serializes object with string array relationship', () => {
+    const serialized = serializer('projects', {
+      id: '2',
+      name: 'Test project',
+      owner: { id: '3' },
+      collaborators: ['4', '5'],
+    });
+
+    expect(serialized).to.be.equal(JSON.stringify(expected));
+  });
+
+  it('serializes object with object array relationship', () => {
+    const serialized = serializer('projects', {
+      id: '2',
+      name: 'Test project',
+      owner: { id: '3' },
+      collaborators: [{ id: '4' }, { id: '5' }],
+    });
+
+    expect(serialized).to.be.equal(JSON.stringify(expected));
+  });
+
+  it('serializes object with string in relationship', () => {
+    const serialized = serializer('projects', {
+      id: '2',
+      name: 'Test project',
+      owner: '3',
+      collaborators: ['4', '5'],
+    });
+
+    expect(serialized).to.be.equal(JSON.stringify(expected));
   });
 });
