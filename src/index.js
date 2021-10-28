@@ -83,11 +83,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
     case CREATE:
       url = `${apiUrl}/${resource}`;
       options.method = 'POST';
-      try {
-        options.data = serialize(resource, params.data);
-      } catch (err) {
-        console.log(err);
-      }
+      options.data = serialize(resource, params.data);
       break;
 
     case UPDATE: {
