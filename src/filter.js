@@ -4,7 +4,7 @@ export const parseIdsFilter = ({ ids }) => (ids.length > 1 ? `any(id,${ids.reduc
 
 export const makeFilter = ({ filter }) => filter?.raw;
 
-export const makeReferenceFilter = ({ target, id }) => `eq(${target},'${id}')`;
+export const makeReferenceFilter = ({ target, id }) => `equals(${target},'${id}')`;
 
 export const combineFilters = (...filters) => {
   const [filter1, ...rest] = filters.filter(f => f?.length > 1);
