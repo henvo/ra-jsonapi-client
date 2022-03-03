@@ -248,3 +248,33 @@ describe('GET_LIST with {total: null}', () => {
     })).to.eventually.have.property('total').that.is.equal(5);
   });
 });
+
+describe('GET_LIST with {total: null} and X-Total-Count header', () => {
+  it('contains total property with X-Total-Count value', () => {
+      nock('http://api.example.com')
+        .get(/users.*sort=name.*/)
+        .reply(200, getListNoMeta, {'X-Total-Count': 200});
+  
+      const noMetaClient = jsonapiClient('http://api.example.com', {
+        total: null,
+      });
+  
+      return expect(noMetaClient('GET_LIST', 'users', {
+        pagination: { page: 1, perPage: 25 },
+        sort: { field: 'name', order: 'ASC' },
+      })).to.eventually.have.property('total').that.is.equal(200);
+  });
+});
+
+describe('GET_LIST with meta and X-Total-Count header', () => {
+  it('contains total property using X-Total-Count in preference to meta value', () => {
+      nock('http://api.example.com')
+        .get(/users.*sort=name.*/)
+        .reply(200, getListNoMeta, {'X-Total-Count': 200});
+  
+      return expect(client('GET_LIST', 'users', {
+        pagination: { page: 1, perPage: 25 },
+        sort: { field: 'name', order: 'ASC' },
+      })).to.eventually.have.property('total').that.is.equal(200);
+  });
+});

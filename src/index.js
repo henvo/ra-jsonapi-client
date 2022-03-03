@@ -144,9 +144,9 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
       // For all collection requests get the total count.
       if ([GET_LIST, GET_MANY, GET_MANY_REFERENCE].includes(type)) {
-        // When meta data and the 'total' setting is provided try
-        // to get the total count.
-        if (response.data.meta && settings.total) {
+        if ('x-total-count' in response.headers) {
+          total = parseInt(response.headers['x-total-count']);
+        } else if (response.data.meta && settings.total) {
           total = response.data.meta[settings.total];
         }
 
