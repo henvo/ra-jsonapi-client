@@ -79,7 +79,9 @@ Which will work for:
 ```
 If this option is not set it will fall back to `total`.
 
-In addition, if your server doesn't provide a count field, you can set *total
+If your server supports the `X-Total-Count` header, and this header is sent on the response, then this will be used in preference to any *total key/value* found in the meta object.
+
+In addition, if your server doesn't provide either the `X-Total-Count` header or provide a count field in the meta object, then you can set *total
 count* to `null`, and the provider will assume the total count is the same as
 the length of the data array:
 
