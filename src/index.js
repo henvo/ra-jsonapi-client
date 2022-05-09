@@ -100,7 +100,7 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
 
     case GET_MANY: {
       const query = stringify({
-        'filter[id]': params.ids,
+        [`filter[${settings.getManyKey}]`]: params.ids,
       }, { arrayFormat: settings.arrayFormat });
 
       url = `${apiUrl}/${resource}?${query}`;
