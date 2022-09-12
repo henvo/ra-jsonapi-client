@@ -147,9 +147,15 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
         // When meta data and the 'total' setting is provided try
         // to get the total count.
         if (response.data.meta && settings.total) {
-          total = response.data.meta[settings.total];
+          if (Array.isArray(settings.total)) {
+            total = response.data.meta;
+            settings.total.forEach((setting) => {
+              total = total[setting];
+            });
+          } else {
+            total = response.data.meta[settings.total];
+          }
         }
-
         // Use the length of the data array as a fallback.
         total = total || response.data.data.length;
       }

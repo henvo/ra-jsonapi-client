@@ -10,6 +10,7 @@ import getOne from './fixtures/get-one';
 import create from './fixtures/create';
 import update from './fixtures/update';
 import getMany from './fixtures/get-many';
+import getListNestedCount from './fixtures/get-list-nested-count';
 
 chai.use(chaiAsPromised);
 
@@ -240,6 +241,23 @@ describe('GET_LIST with {total: null}', () => {
 
     const noMetaClient = jsonapiClient('http://api.example.com', {
       total: null,
+    });
+
+    return expect(noMetaClient('GET_LIST', 'users', {
+      pagination: { page: 1, perPage: 25 },
+      sort: { field: 'name', order: 'ASC' },
+    })).to.eventually.have.property('total').that.is.equal(5);
+  });
+});
+
+describe('GET_LIST with nested total count', () => {
+  it('contains a total property', () => {
+    nock('http://api.example.com')
+      .get(/users.*sort=name.*/)
+      .reply(200, getListNestedCount);
+
+    const noMetaClient = jsonapiClient('http://api.example.com', {
+      total: ['cursor', 'total-count'],
     });
 
     return expect(noMetaClient('GET_LIST', 'users', {
