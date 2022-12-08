@@ -101,8 +101,8 @@ const settings = {
 The default value is:
 ``` javascript
 {
-  Accept: 'application/vnd.api+json; charset=utf-8',
-  'Content-Type': 'application/vnd.api+json; charset=utf-8',
+  Accept: 'application/vnd.api+json',
+  'Content-Type': 'application/vnd.api+json',
 }
 ```
 
