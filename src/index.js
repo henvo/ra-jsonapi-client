@@ -16,7 +16,7 @@ import defaultSettings from './default-settings';
 import { NotImplementedError } from './errors';
 import init from './initializer';
 import {
-  makeFilter, combineFilters, makeReferenceFilter, parseIdsFilter,
+  makeFilter, combineFilters, makeReferenceFilter,
 } from './filter';
 
 // Set HTTP interceptors.
@@ -99,7 +99,37 @@ export default (apiUrl, userSettings = {}) => (type, resource, params) => {
       break;
 
     case GET_MANY: {
-      query.filter = parseIdsFilter(params);
+      const query = stringify({
+        [`filter[${settings.getManyKey}]`]: params.ids,
+      }, { arrayFormat: settings.arrayFormat });
+
+      url = `${apiUrl}/${resource}?${query}`;
+      break;
+    }
+
+    case GET_MANY_REFERENCE: {
+      const { page, perPage } = params.pagination;
+
+      // Create query with pagination params.
+      const query = {
+        'page[number]': page,
+        'page[size]': perPage,
+      };
+
+      // Add all filter params to query.
+      Object.keys(params.filter || {}).forEach((key) => {
+        query[`filter[${key}]`] = params.filter[key];
+      });
+
+      // Add the reference id to the filter params.
+      query[`filter[${params.target}]`] = params.id;
+
+      // Add sort parameter
+      if (params.sort && params.sort.field) {
+        const prefix = params.sort.order === 'ASC' ? '' : '-';
+        query.sort = `${prefix}${params.sort.field}`;
+      }
+
       url = `${apiUrl}/${resource}?${stringify(query)}`;
       break;
     }

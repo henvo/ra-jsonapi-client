@@ -150,6 +150,20 @@ This package makes usage of the aweseome `qs` querystring parsing library.
 Default: `brackets`
 Options: `indices`, `repeat`, `comma`
 
+### Key for `GET_MANY` filter
+In most cases `filter[id]` is enough for get many operation.
+But it is not a specification of JSONAPI.
+You can change this key `id` to any string.
+
+``` javascript
+{
+  // When your api requires filter[id_in] for get many operation.
+  getManyKey: 'id_in'
+}
+```
+
+Default: `id`
+
 ### Relationships Map
 
 If you need to work with relationships you will need to declare these in order for the data provider to be able to serialize your data.
