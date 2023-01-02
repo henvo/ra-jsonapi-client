@@ -1373,7 +1373,7 @@ eslint-module-utils@^2.6.2:
 
 eslint-plugin-import@^2.14.0:
   version "2.24.2"
-  resolved "https://registry.npmjs.org/eslint-plugin-import/-/eslint-plugin-import-2.24.2.tgz"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.24.2.tgz#2c8cd2e341f3885918ee27d18479910ade7bb4da"
   dependencies:
     array-includes "^3.1.3"
     array.prototype.flat "^1.2.4"
