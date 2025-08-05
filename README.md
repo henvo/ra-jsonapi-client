@@ -5,6 +5,19 @@
 A JSONAPI compatible data provider for
 [react-admin](https://github.com/marmelab/react-admin).
 
+## Deprecation notice
+This project has been a lot of fun and has taught me how exciting and enjoyable
+developing open source software can be. I hope that with this project I have
+been able to contribute a little to spreading the idea of open source software
+and giving something back to the community.
+
+We are constantly evolving, just like our software – and sometimes you have to
+have the courage to draw a line under things. As I no longer use JSONAPI for my
+projects and interest in the repository has declined over the last few years,
+this repository will be archived on 5 August 2025.
+
+Many thanks to all contributors and users who have given this project a star.
+
 
 ## Features
 Currently these actions are supported:
